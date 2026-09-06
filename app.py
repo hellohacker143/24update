@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 # =========================================================
 # PAGE CONFIG
 # =========================================================
+
 st.set_page_config(
     page_title="24 Updates",
     page_icon="⚡",
@@ -14,6 +15,7 @@ st.set_page_config(
 # =========================================================
 # COLORS
 # =========================================================
+
 BG = "#212121"
 SIDEBAR = "#171717"
 CARD = "#2A2A2A"
@@ -27,12 +29,12 @@ GREEN_DARK = "#0D8F71"
 # =========================================================
 # CUSTOM CSS
 # =========================================================
+
 st.markdown(
     f"""
     <style>
 
-    /* ---------- MAIN APP ---------- */
-
+    /* MAIN APP */
     .stApp {{
         background: {BG};
         color: {TEXT};
@@ -48,8 +50,7 @@ st.markdown(
         padding-bottom: 80px;
     }}
 
-    /* ---------- SIDEBAR ---------- */
-
+    /* SIDEBAR */
     [data-testid="stSidebar"] {{
         background: {SIDEBAR};
         border-right: 1px solid {BORDER};
@@ -59,8 +60,7 @@ st.markdown(
         color: {TEXT};
     }}
 
-    /* ---------- TITLE ---------- */
-
+    /* TITLE */
     .app-title {{
         font-size: 38px;
         font-weight: 700;
@@ -75,8 +75,7 @@ st.markdown(
         margin-bottom: 28px;
     }}
 
-    /* ---------- CATEGORY NAV ---------- */
-
+    /* CATEGORY BAR */
     .category-bar {{
         display: flex;
         gap: 8px;
@@ -85,6 +84,7 @@ st.markdown(
         border: 1px solid {BORDER};
         border-radius: 14px;
         margin-bottom: 25px;
+        overflow-x: auto;
     }}
 
     .category-item {{
@@ -93,6 +93,7 @@ st.markdown(
         color: {MUTED};
         font-size: 14px;
         font-weight: 500;
+        white-space: nowrap;
     }}
 
     .category-item.active {{
@@ -100,8 +101,7 @@ st.markdown(
         color: {TEXT};
     }}
 
-    /* ---------- SECTION ---------- */
-
+    /* SECTION TITLE */
     .section-title {{
         font-size: 20px;
         font-weight: 600;
@@ -109,8 +109,7 @@ st.markdown(
         margin: 20px 0 15px 0;
     }}
 
-    /* ---------- UPDATE CARD ---------- */
-
+    /* UPDATE CARD */
     .update-card {{
         background: {CARD};
         border: 1px solid {BORDER};
@@ -155,8 +154,7 @@ st.markdown(
         font-size: 12px;
     }}
 
-    /* ---------- SEARCH ---------- */
-
+    /* SEARCH */
     .stTextInput input {{
         background: #2A2A2A !important;
         color: {TEXT} !important;
@@ -169,16 +167,19 @@ st.markdown(
         box-shadow: 0 0 0 1px {GREEN} !important;
     }}
 
-    /* ---------- SELECTBOX ---------- */
-
+    /* SELECT BOX */
     div[data-baseweb="select"] > div {{
         background: #2A2A2A;
         border-color: {BORDER};
         border-radius: 10px;
     }}
 
-    /* ---------- BUTTON ---------- */
+    /* RADIO */
+    [data-testid="stSidebar"] .stRadio label {{
+        color: {TEXT};
+    }}
 
+    /* BUTTON */
     .stButton button {{
         background: {GREEN};
         color: white;
@@ -192,19 +193,46 @@ st.markdown(
         color: white;
     }}
 
-    /* ---------- DIVIDER ---------- */
-
+    /* DIVIDER */
     hr {{
         border-color: {BORDER};
     }}
 
-    /* ---------- FOOTER ---------- */
-
+    /* FOOTER */
     .footer {{
         text-align: center;
         color: #777777;
         font-size: 12px;
         margin-top: 40px;
+    }}
+
+    /* MOBILE */
+    @media (max-width: 768px) {{
+
+        .main .block-container {{
+            padding: 20px 15px 60px 15px;
+        }}
+
+        .app-title {{
+            font-size: 30px;
+        }}
+
+        .app-subtitle {{
+            font-size: 14px;
+        }}
+
+        .update-card {{
+            min-height: auto;
+            padding: 17px;
+        }}
+
+        .update-title {{
+            font-size: 17px;
+        }}
+
+        .category-bar {{
+            margin-bottom: 20px;
+        }}
     }}
 
     </style>
@@ -226,7 +254,7 @@ with st.sidebar:
             margin-bottom:5px;
             color:{TEXT};
         ">
-        ⚡ 24 Updates
+            ⚡ 24 Updates
         </div>
 
         <div style="
@@ -234,7 +262,7 @@ with st.sidebar:
             font-size:13px;
             margin-bottom:30px;
         ">
-        Your daily update assistant
+            Your daily update assistant
         </div>
         """,
         unsafe_allow_html=True
@@ -268,12 +296,12 @@ with st.sidebar:
         <div style="
             color:{MUTED};
             font-size:12px;
-            line-height:1.6;
+            line-height:1.8;
         ">
-        ⚡ Fresh updates<br>
-        🔎 Smart search<br>
-        🕒 24/48 hour filter<br>
-        📱 Responsive design
+            ⚡ Fresh updates<br>
+            🔎 Smart search<br>
+            🕒 24/48 hour filter<br>
+            📱 Responsive design
         </div>
         """,
         unsafe_allow_html=True
@@ -289,7 +317,9 @@ st.markdown(
 )
 
 st.markdown(
-    '<div class="app-subtitle">Fresh Cricket, Movies, News & Jobs — all in one place.</div>',
+    '<div class="app-subtitle">'
+    'Fresh Cricket, Movies, News & Jobs — all in one place.'
+    '</div>',
     unsafe_allow_html=True
 )
 
@@ -309,11 +339,27 @@ search = st.text_input(
 st.markdown(
     """
     <div class="category-bar">
-        <div class="category-item active">⚡ All</div>
-        <div class="category-item">🏏 Cricket</div>
-        <div class="category-item">🎬 Movies</div>
-        <div class="category-item">📰 News</div>
-        <div class="category-item">💼 Jobs</div>
+
+        <div class="category-item active">
+            ⚡ All
+        </div>
+
+        <div class="category-item">
+            🏏 Cricket
+        </div>
+
+        <div class="category-item">
+            🎬 Movies
+        </div>
+
+        <div class="category-item">
+            📰 News
+        </div>
+
+        <div class="category-item">
+            💼 Jobs
+        </div>
+
     </div>
     """,
     unsafe_allow_html=True
@@ -328,56 +374,80 @@ updates = [
     {
         "category": "🏏 Cricket",
         "title": "Latest Cricket Match Updates",
-        "description": "Today's match schedules, results, team news and important cricket developments.",
+        "description": (
+            "Today's match schedules, results, team news "
+            "and important cricket developments."
+        ),
         "hours": 2
     },
 
     {
         "category": "🏏 Cricket",
         "title": "Upcoming Cricket Matches",
-        "description": "Check upcoming matches, teams, timings and recent performances.",
+        "description": (
+            "Check upcoming matches, teams, timings "
+            "and recent performances."
+        ),
         "hours": 8
     },
 
     {
         "category": "🎬 Movies",
         "title": "Latest Movie Updates",
-        "description": "New movie announcements, trailers, releases and entertainment updates.",
+        "description": (
+            "New movie announcements, trailers, releases "
+            "and entertainment updates."
+        ),
         "hours": 4
     },
 
     {
         "category": "🎬 Movies",
         "title": "OTT & Box Office Updates",
-        "description": "Latest OTT releases, streaming information and box-office developments.",
+        "description": (
+            "Latest OTT releases, streaming information "
+            "and box-office developments."
+        ),
         "hours": 18
     },
 
     {
         "category": "📰 News",
         "title": "Top Breaking News",
-        "description": "Important current events and major developments from reliable sources.",
+        "description": (
+            "Important current events and major "
+            "developments from reliable sources."
+        ),
         "hours": 3
     },
 
     {
         "category": "📰 News",
         "title": "Trending News",
-        "description": "Popular stories and important updates from the latest news cycle.",
+        "description": (
+            "Popular stories and important updates "
+            "from the latest news cycle."
+        ),
         "hours": 20
     },
 
     {
         "category": "💼 Jobs",
         "title": "Latest Jobs & Internships",
-        "description": "Fresh opportunities for students, freshers and technology professionals.",
+        "description": (
+            "Fresh opportunities for students, freshers "
+            "and technology professionals."
+        ),
         "hours": 5
     },
 
     {
         "category": "💼 Jobs",
         "title": "Developer Job Updates",
-        "description": "Recently posted developer jobs and internship opportunities.",
+        "description": (
+            "Recently posted developer jobs and "
+            "internship opportunities."
+        ),
         "hours": 22
     }
 
@@ -393,13 +463,17 @@ filtered = []
 
 for item in updates:
 
+    # Time filter
     if item["hours"] > max_hours:
         continue
 
+    # Category filter
     if category != "All Updates":
+
         if item["category"] != category:
             continue
 
+    # Search filter
     if search:
 
         searchable = (
@@ -420,11 +494,11 @@ for item in updates:
 # =========================================================
 
 st.markdown(
-    f'<div class="section-title">Latest {time_filter} updates</div>',
+    f'<div class="section-title">'
+    f'Latest {time_filter} updates'
+    f'</div>',
     unsafe_allow_html=True
 )
-
-st.caption(f"{len(filtered)} updates available")
 
 # =========================================================
 # UPDATE CARDS
@@ -432,7 +506,9 @@ st.caption(f"{len(filtered)} updates available")
 
 if not filtered:
 
-    st.info("No updates found. Try another search or filter.")
+    st.info(
+        "No updates found. Try another search or filter."
+    )
 
 else:
 
@@ -442,7 +518,9 @@ else:
 
     for index, item in enumerate(filtered):
 
-        posted = now - timedelta(hours=item["hours"])
+        posted = now - timedelta(
+            hours=item["hours"]
+        )
 
         with columns[index % 2]:
 
@@ -465,7 +543,9 @@ else:
                     <div class="update-time">
                         🕒 Updated {item["hours"]} hours ago
                         &nbsp;•&nbsp;
-                        {posted.strftime("%d %b %Y, %I:%M %p")}
+                        {posted.strftime(
+                            "%d %b %Y, %I:%M %p"
+                        )}
                     </div>
 
                 </div>
@@ -480,10 +560,14 @@ else:
 st.markdown(
     """
     <div class="footer">
-        ⚡ 24 Updates &nbsp;•&nbsp;
-        Cricket &nbsp;•&nbsp;
-        Movies &nbsp;•&nbsp;
-        News &nbsp;•&nbsp;
+        ⚡ 24 Updates
+        &nbsp;•&nbsp;
+        Cricket
+        &nbsp;•&nbsp;
+        Movies
+        &nbsp;•&nbsp;
+        News
+        &nbsp;•&nbsp;
         Jobs
         <br><br>
         Live-data integration can be added next.
