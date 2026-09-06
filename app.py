@@ -1,9 +1,9 @@
 import streamlit as st
 import requests
 
-# -----------------------------
-# PAGE
-# -----------------------------
+# --------------------------------------------------
+# PAGE CONFIG
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="24 Updates",
@@ -11,9 +11,9 @@ st.set_page_config(
     layout="centered"
 )
 
-# -----------------------------
-# STYLE
-# -----------------------------
+# --------------------------------------------------
+# CUSTOM CSS
+# --------------------------------------------------
 
 st.markdown("""
 <style>
@@ -24,20 +24,27 @@ st.markdown("""
 }
 
 .main .block-container {
-    max-width: 750px;
-    padding-top: 60px;
+    max-width: 760px;
+    padding-top: 55px;
 }
 
-.title {
-    font-size: 42px;
-    font-weight: 700;
+h1 {
     text-align: center;
+    font-size: 42px !important;
 }
 
 .subtitle {
     text-align: center;
     color: #A0A0A0;
     margin-bottom: 35px;
+}
+
+.card {
+    background: #2A2A2A;
+    border: 1px solid #3F3F3F;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 25px;
 }
 
 .stTextInput input {
@@ -47,50 +54,55 @@ st.markdown("""
     border-radius: 12px !important;
 }
 
+.stTextInput input:focus {
+    border-color: #10A37F !important;
+}
+
+.stSelectbox div[data-baseweb="select"] > div {
+    background: #2A2A2A;
+    border-radius: 12px;
+}
+
 .stButton button {
     width: 100%;
     background: #10A37F;
     color: white;
     border: none;
     border-radius: 10px;
-    padding: 10px;
     font-weight: 600;
+    padding: 10px;
 }
 
 .stButton button:hover {
     background: #0D8F71;
 }
 
-.response {
-    background: #2A2A2A;
-    border: 1px solid #3F3F3F;
-    border-radius: 15px;
-    padding: 22px;
-    margin-top: 25px;
+.footer {
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+    margin-top: 35px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
+# --------------------------------------------------
 # HEADER
-# -----------------------------
+# --------------------------------------------------
 
-st.markdown(
-    '<div class="title">⚡ 24 Updates</div>',
-    unsafe_allow_html=True
-)
+st.title("⚡ 24 Updates")
 
 st.markdown(
     '<div class="subtitle">'
-    'Enter your Gemini API key and ask anything'
+    'Cricket • Movies • News • Jobs'
     '</div>',
     unsafe_allow_html=True
 )
 
-# -----------------------------
-# API KEY INPUT
-# -----------------------------
+# --------------------------------------------------
+# API KEY
+# --------------------------------------------------
 
 api_key = st.text_input(
     "🔑 Gemini API Key",
@@ -98,18 +110,96 @@ api_key = st.text_input(
     placeholder="Enter your Gemini API key"
 )
 
-# -----------------------------
-# USER QUESTION
-# -----------------------------
+# --------------------------------------------------
+# CATEGORY
+# --------------------------------------------------
 
-question = st.text_input(
-    "💬 Your Question",
-    placeholder="Example: What are today's cricket updates?"
+category = st.selectbox(
+    "Category",
+    [
+        "🏏 Cricket",
+        "🎬 Movies",
+        "📰 News",
+        "💼 Jobs"
+    ]
 )
 
-# -----------------------------
-# BUTTON
-# -----------------------------
+# --------------------------------------------------
+# TIME RANGE
+# --------------------------------------------------
+
+time_range = st.selectbox(
+    "Time Range",
+    [
+        "Last 24 Hours",
+        "Last 48 Hours"
+    ]
+)
+
+# --------------------------------------------------
+# QUESTION
+# --------------------------------------------------
+
+question = st.text_input(
+    "💬 What do you want to know?",
+    placeholder="Example: Give me today's cricket updates"
+)
+
+# --------------------------------------------------
+# GEMINI REQUEST
+# --------------------------------------------------
+
+def generate_response(api_key, prompt):
+
+    url = (
+        "https://generativelanguage.googleapis.com/"
+        "v1beta/models/gemini-2.5-flash:generateContent"
+    )
+
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": api_key
+    }
+
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": prompt
+                    }
+                ]
+            }
+        ],
+        "tools": [
+            {
+                "google_search": {}
+            }
+        ]
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=body,
+        timeout=60
+    )
+
+    if response.status_code != 200:
+        return None, response.text
+
+    data = response.json()
+
+    try:
+        answer = data["candidates"][0]["content"]["parts"][0]["text"]
+        return answer, None
+
+    except (KeyError, IndexError):
+        return None, "Gemini returned an unexpected response."
+
+# --------------------------------------------------
+# GENERATE BUTTON
+# --------------------------------------------------
 
 if st.button("✨ Generate Response"):
 
@@ -123,56 +213,49 @@ if st.button("✨ Generate Response"):
 
     else:
 
-        url = (
-            "https://generativelanguage.googleapis.com/"
-            "v1beta/models/gemini-2.5-flash:generateContent"
-        )
+        prompt = f"""
+You are the AI assistant for an application called 24 Updates.
 
-        headers = {
-            "Content-Type": "application/json",
-            "x-goog-api-key": api_key
-        }
+Category:
+{category}
 
-        data = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": question
-                        }
-                    ]
-                }
-            ],
-            "tools": [
-                {
-                    "google_search": {}
-                }
-            ]
-        }
+Time range requested:
+{time_range}
 
-        with st.spinner("Generating response..."):
+User question:
+{question}
+
+Give a clear and concise answer.
+
+For current information:
+- Use Google Search grounding when available.
+- Prefer recent and reliable sources.
+- Do not invent current events.
+- Do not present old information as new.
+- Clearly say when something cannot be verified.
+- Keep the response easy to read.
+- Include source information when available.
+"""
+
+        with st.spinner("Getting the latest response..."):
 
             try:
 
-                response = requests.post(
-                    url,
-                    headers=headers,
-                    json=data,
-                    timeout=60
+                answer, error = generate_response(
+                    api_key,
+                    prompt
                 )
 
-                if response.status_code == 200:
+                if error:
 
-                    result = response.json()
-
-                    answer = (
-                        result["candidates"][0]
-                        ["content"]["parts"][0]
-                        ["text"]
+                    st.error(
+                        f"API Error: {error}"
                     )
 
+                else:
+
                     st.markdown(
-                        '<div class="response">',
+                        '<div class="card">',
                         unsafe_allow_html=True
                     )
 
@@ -185,14 +268,28 @@ if st.button("✨ Generate Response"):
                         unsafe_allow_html=True
                     )
 
-                else:
-
-                    st.error(
-                        f"API Error: {response.text}"
-                    )
-
-            except Exception as e:
+            except requests.exceptions.Timeout:
 
                 st.error(
-                    f"Connection error: {e}"
+                    "The request timed out. Please try again."
                 )
+
+            except requests.exceptions.RequestException:
+
+                st.error(
+                    "Could not connect to the Gemini API."
+                )
+
+# --------------------------------------------------
+# FOOTER
+# --------------------------------------------------
+
+st.markdown(
+    """
+    <div class="footer">
+        ⚡ 24 Updates<br>
+        Powered by Gemini
+    </div>
+    """,
+    unsafe_allow_html=True
+)
