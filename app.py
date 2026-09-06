@@ -1,13 +1,24 @@
 import streamlit as st
 from google import genai
 
-API_KEY = st.secrets["GEMINI_API_KEY"]
+st.set_page_config(page_title="Charans LLM")
 
-client = genai.Client(api_key=API_KEY)
+st.title("🤖 Charans LLM")
 
-response = client.models.generate_content(
-    model="gemini-3.6-flash",
-    contents="Hello"
-)
+api_key = st.secrets["AQ.Ab8RN6LW6A3HA71ENi7kV0QLfG-GKg9sIG2-21m-viFP-ccU_A"]
 
-st.write(response.text)
+client = genai.Client(api_key=api_key)
+
+user_input = st.text_input("Enter your question")
+
+if st.button("Ask"):
+    if user_input.strip():
+        with st.spinner("Thinking..."):
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=user_input
+            )
+
+        st.write(response.text)
+    else:
+        st.warning("Please enter something.")
